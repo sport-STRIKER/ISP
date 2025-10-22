@@ -39,7 +39,7 @@ def CheckVariants(samfile, fasta):
 
 def PrintResult(vcf_lines):
     print("##fileformat=VCFv4.2")
-    print("#CHROM\tPOS\tID\tREF\tALT")
+    print("#CHROM\tPOS\t\tID\tREF\tALT")
     for line in sorted(vcf_lines):
         print(line)
 
