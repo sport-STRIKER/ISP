@@ -15,9 +15,10 @@ def PotentialVariants(samfile, fasta, variants, total_coverage):
 
             for i, (ref_base, query_base) in enumerate(zip(ref_seq, query_seq)):
                 pos = read.reference_start + i + 1  
+                total_coverage[pos] += 1 
+
                 if ref_base != query_base and ref_base != "N" and query_base != "N":
-                    variants[pos][query_base] += 1
-                total_coverage[pos] += 1    
+                    variants[pos][query_base] += 1   
 
 def CheckVariants(samfile, fasta):
     variants = defaultdict(lambda: defaultdict(int))
@@ -31,20 +32,21 @@ def CheckVariants(samfile, fasta):
         if coverage >= MIN_COVERAGE:
             for alt_base, count in variants[pos].items():
                 freq = count / coverage
-                if freq >= MIN_ALLELE_FREQ:
-                    ref_base = fasta[samfile.getrname(0)][pos-1:pos].seq.upper() 
+                if count >= MIN_COVERAGE and freq > MIN_ALLELE_FREQ:  
+                    ref_base = fasta[REF_NAME][pos-1:pos].seq.upper() 
                     vcf_lines.append(f"{REF_NAME}\t{pos}\t.\t{ref_base}\t{alt_base}")
 
     return vcf_lines
 
 def PrintResult(vcf_lines):
     with open("output.vcf", "w") as f:
+        f.write("##fileformat=VCFv4.2\n")
         f.write("#CHROM\tPOS\t\t\tID\tREF\tALT\n")
         
         for line in sorted(vcf_lines):
             print(line, file=f)
 
-    print(f"Варианты сохранены в output.vcf")
+    print(f"Варианты сохранены в output.vcf ({len(vcf_lines)} SNP)")
 
 def main():
     fasta = Fasta("chr1.fasta")
