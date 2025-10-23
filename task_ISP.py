@@ -38,10 +38,13 @@ def CheckVariants(samfile, fasta):
     return vcf_lines
 
 def PrintResult(vcf_lines):
-    print("##fileformat=VCFv4.2")
-    print("#CHROM\tPOS\t\tID\tREF\tALT")
-    for line in sorted(vcf_lines):
-        print(line)
+    with open("output.vcf", "w") as f:
+        f.write("#CHROM\tPOS\t\t\tID\tREF\tALT\n")
+        
+        for line in sorted(vcf_lines):
+            print(line, file=f)
+
+    print(f"Варианты сохранены в output.vcf")
 
 def main():
     fasta = Fasta("chr1.fasta")
